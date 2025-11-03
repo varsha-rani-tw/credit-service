@@ -13,6 +13,7 @@ def client():
     return TestClient(app)
 
 
+
 class TestKafkaIntegration:
     """Integration tests for Kafka messaging."""
 
