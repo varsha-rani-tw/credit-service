@@ -1,5 +1,3 @@
-import pytest
-from src.mapper.ApplicationDataMapper import ApplicationDataMapper
 from src.DTO.ApplicationDataDTO import ApplicationDataDTO
 from src.schema.CibilScoreSchema import ApplicationRequest
 
