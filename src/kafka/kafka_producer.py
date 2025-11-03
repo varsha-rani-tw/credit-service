@@ -1,6 +1,3 @@
-"""
-Kafka producer for publishing messages.
-"""
 import json
 import logging
 from typing import Dict, Any, Optional
@@ -13,31 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class KafkaProducerService:
-    """
-    Kafka producer service for publishing messages to Kafka topics.
-
-    This service handles connection management, message serialization,
-    and error handling for Kafka message publishing.
-    """
 
     def __init__(self, config: KafkaConfig):
-        """
-        Initialize Kafka producer service.
-
-        Args:
-            config: Kafka configuration settings
-        """
         self.config = config
         self.producer: Optional[AIOKafkaProducer] = None
         self._is_started = False
 
     async def start(self):
-        """
-        Start the Kafka producer.
 
-        Creates and starts the AIOKafkaProducer instance.
-        Should be called during application startup.
-        """
         if self._is_started:
             logger.warning("Kafka producer already started")
             return
@@ -63,12 +43,6 @@ class KafkaProducerService:
             raise
 
     async def stop(self):
-        """
-        Stop the Kafka producer.
-
-        Flushes pending messages and closes the connection.
-        Should be called during application shutdown.
-        """
         if not self._is_started or not self.producer:
             logger.warning("Kafka producer not started or already stopped")
             return
@@ -88,32 +62,18 @@ class KafkaProducerService:
         message: Dict[str, Any],
         key: Optional[str] = None
     ) -> bool:
-        """
-        Publish a message to a Kafka topic.
 
-        Args:
-            topic: Kafka topic name
-            message: Message payload as dictionary
-            key: Optional message key for partitioning
-
-        Returns:
-            True if message was published successfully, False otherwise
-
-        Raises:
-            RuntimeError: If producer is not started
-        """
         if not self._is_started or not self.producer:
             raise RuntimeError("Kafka producer is not started. Call start() first.")
 
         try:
-            # Send message to Kafka
+
             future = await self.producer.send(
                 topic=topic,
                 value=message,
                 key=key
             )
 
-            # Get metadata about the sent message
             metadata = await future
             logger.info(
                 f"Message published successfully to topic '{topic}' "
@@ -130,15 +90,7 @@ class KafkaProducerService:
             return False
 
     async def publish_loan_application(self, application_data: Dict[str, Any]) -> bool:
-        """
-        Publish loan application data to the loan_applications_submitted topic.
 
-        Args:
-            application_data: Application data including CIBIL score
-
-        Returns:
-            True if published successfully, False otherwise
-        """
         topic = self.config.topic_loan_applications
         key = str(application_data.get("application_id", ""))
 
@@ -152,10 +104,5 @@ class KafkaProducerService:
 
     @property
     def is_healthy(self) -> bool:
-        """
-        Check if the Kafka producer is healthy and ready to send messages.
 
-        Returns:
-            True if producer is started and ready, False otherwise
-        """
         return self._is_started and self.producer is not None

@@ -34,39 +34,16 @@ async def simulate_score(
     mapper: ApplicationDataMapper = Depends(Provide[Container.application_data_mapper]),
     kafka_producer: KafkaProducerService = Depends(Provide[Container.kafka_producer])
 ):
-    """
-    Simulate CIBIL score for a loan application.
 
-    This endpoint:
-    1. Receives application data
-    2. Calculates CIBIL score using the handler chain
-    3. Publishes the result to Kafka topic 'loan_applications_submitted'
-    4. Returns the calculated score
-
-    Args:
-        app_data: Application request data
-        service: Injected CibilScoreService
-        mapper: Injected ApplicationDataMapper
-        kafka_producer: Injected KafkaProducerService
-
-    Returns:
-        CibilScoreResponse with calculated score
-
-    Raises:
-        HTTPException: If simulation or Kafka publishing fails
-    """
     try:
-        # Step 1: Map request to DTO
         application_data_dto = mapper.from_dict(app_data)
 
-        # Step 2: Calculate CIBIL score
         calculated_score = service.simulate(application_data_dto)
 
         logger.info(
             f"CIBIL score calculated for application {application_data_dto.application_id}: {calculated_score}"
         )
 
-        # Step 3: Prepare message for Kafka
         kafka_message = {
             "application_id": application_data_dto.application_id,
             "pan_number": application_data_dto.pan_number,
@@ -76,10 +53,9 @@ async def simulate_score(
             "loan_type": application_data_dto.loan_type,
             "status": application_data_dto.status or "pending",
             "cibil_score": calculated_score,
-            "calculated_cibil_score": calculated_score,  # Explicitly show calculated score
+            "calculated_cibil_score": calculated_score,
         }
 
-        # Step 4: Publish to Kafka
         kafka_success = await kafka_producer.publish_loan_application(kafka_message)
 
         if not kafka_success:
@@ -88,7 +64,6 @@ async def simulate_score(
                 "but returning calculated score"
             )
 
-        # Step 5: Return response
         return CibilScoreResponse(
             application_id=application_data_dto.application_id,
             cibil_score=calculated_score,
