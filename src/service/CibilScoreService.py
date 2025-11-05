@@ -41,6 +41,19 @@ class CibilScoreService:
         return final_cibil_score
 
 
+    def  publish_cibil_score(self, final_cibil_score: int, application_data: ApplicationDataDTO):
+        kafka_message = {
+            "application_id": application_data.application_id,
+            "pan_number": application_data.pan_number,
+            "application_name": application_data.application_name,
+            "monthly_income_inr": application_data.monthly_income_inr,
+            "loan_amount_inr": application_data.loan_amount_inr,
+            "loan_type": application_data.loan_type,
+            "status": application_data.status or "pending",
+            "cibil_score": final_cibil_score,
+        }
+
+
 
 
 

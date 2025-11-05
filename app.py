@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from src.router.CibilScoreRouter import router as cibil_router
 from src.containers import Container
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -18,17 +17,11 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Lifespan context manager for application startup and shutdown.
 
-    Handles:
-    - Kafka producer initialization on startup
-    - Kafka producer cleanup on shutdown
-    """
-    # Startup
     logger.info("Starting up Credit Service...")
     container: Container = app.container
     kafka_producer = container.kafka_producer()
+    kafka_consumer = container.kafka_consumer()
 
     try:
         await kafka_producer.start()
@@ -37,10 +30,23 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to start Kafka producer: {e}")
         logger.warning("Service will continue without Kafka publishing capability")
 
+    try:
+        await kafka_consumer.start()
+        logger.info("Kafka consumer started successfully")
+    except Exception as e:
+        logger.error(f"Failed to start Kafka consumer: {e}")
+        logger.warning("Service will continue without Kafka consumption capability")
+
     yield
 
-    # Shutdown
     logger.info("Shutting down Credit Service...")
+
+    try:
+        await kafka_consumer.stop()
+        logger.info("Kafka consumer stopped successfully")
+    except Exception as e:
+        logger.error(f"Error stopping Kafka consumer: {e}")
+
     try:
         await kafka_producer.stop()
         logger.info("Kafka producer stopped successfully")
@@ -49,12 +55,6 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    """
-    Application factory that creates and configures the FastAPI app.
-
-    Returns:
-        Configured FastAPI application instance
-    """
     container = Container()
 
     app = FastAPI(
@@ -64,13 +64,10 @@ def create_app() -> FastAPI:
         lifespan=lifespan
     )
 
-    # Attach container to app for access in routes
     app.container = container
 
-    # Wire container to modules for dependency injection
     container.wire(modules=["src.router.CibilScoreRouter"])
 
-    # Include routers
     app.include_router(cibil_router)
 
     logger.info("Credit Service application created successfully")
@@ -78,5 +75,4 @@ def create_app() -> FastAPI:
     return app
 
 
-# Create the application instance
 app = create_app()

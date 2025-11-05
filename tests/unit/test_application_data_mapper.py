@@ -16,7 +16,7 @@ class TestApplicationDataMapper:
             cibil_score=700
         )
 
-        result = application_mapper.from_dict(request)
+        result = application_mapper.map_application_data_dto(request)
 
         assert isinstance(result, ApplicationDataDTO)
         assert result.application_id == 1
@@ -36,7 +36,7 @@ class TestApplicationDataMapper:
             loan_type="HOME"
         )
 
-        result = application_mapper.from_dict(request)
+        result = application_mapper.map_application_data_dto(request)
 
         assert isinstance(result, ApplicationDataDTO)
         assert result.application_id == 1
@@ -62,7 +62,7 @@ class TestApplicationDataMapper:
         )
 
 
-        result = application_mapper.from_dict(request)
+        result = application_mapper.map_application_data_dto(request)
 
         assert isinstance(result.application_id, int)
         assert isinstance(result.pan_number, str)

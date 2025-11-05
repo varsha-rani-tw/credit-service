@@ -4,7 +4,7 @@ This guide explains how to set up and use Kafka integration in the Credit Servic
 
 ## Overview
 
-The Credit Service publishes CIBIL score calculation results to a Kafka topic `loan_applications_submitted` after processing each loan application.
+The Credit Service publishes CIBIL score calculation results to a Kafka topic `credit_reports_generated` after processing each loan application.
 
 ### Message Flow
 
@@ -14,7 +14,7 @@ POST /simulate-cibil-score
   Calculate CIBIL Score
          ↓
   Publish to Kafka Topic
-  (loan_applications_submitted)
+  (credit_reports_generated)
          ↓
   Return Response to Client
 ```
@@ -64,7 +64,7 @@ Edit `.env` to customize Kafka settings:
 
 ```env
 KAFKA_BOOTSTRAP_SERVERS=localhost:9092
-KAFKA_TOPIC_LOAN_APPLICATIONS=loan_applications_submitted
+KAFKA_TOPIC_CREDIT_SCORE_GENERATED=credit_reports_generated
 KAFKA_CLIENT_ID=credit-service
 ```
 
@@ -110,7 +110,7 @@ curl -X POST http://localhost:8000/simulate-cibil-score \
 
 ### Message Published to Kafka
 
-The following JSON message is published to `loan_applications_submitted` topic:
+The following JSON message is published to `credit_reports_generated` topic:
 
 ```json
 {
@@ -132,7 +132,7 @@ The following JSON message is published to `loan_applications_submitted` topic:
 
 1. Open browser to `http://localhost:8080`
 2. Select cluster: `local`
-3. Navigate to Topics → `loan_applications_submitted`
+3. Navigate to Topics → `credit_reports_generated`
 4. View messages in real-time
 
 ### Using Kafka Console Consumer
@@ -140,7 +140,7 @@ The following JSON message is published to `loan_applications_submitted` topic:
 ```bash
 docker exec -it credit-service-kafka kafka-console-consumer \
   --bootstrap-server localhost:9092 \
-  --topic loan_applications_submitted \
+  --topic credit_reports_generated \
   --from-beginning \
   --property print.key=true
 ```
@@ -149,15 +149,15 @@ docker exec -it credit-service-kafka kafka-console-consumer \
 
 ### Kafka Configuration (`src/config/kafka_config.py`)
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `bootstrap_servers` | `["localhost:9092"]` | Kafka broker addresses |
-| `topic_loan_applications` | `loan_applications_submitted` | Topic name for loan applications |
-| `client_id` | `credit-service` | Client identifier |
-| `compression_type` | `gzip` | Message compression |
-| `acks` | `all` | Acknowledgment level |
-| `retries` | `3` | Number of retry attempts |
-| `enable_idempotence` | `true` | Prevent duplicate messages |
+| Parameter                      | Default | Description |
+|--------------------------------|---------|-------------|
+| `bootstrap_servers`            | `["localhost:9092"]` | Kafka broker addresses |
+| `topic_credit_score_generated` | `credit_reports_generated` | Topic name for loan applications |
+| `client_id`                    | `credit-service` | Client identifier |
+| `compression_type`             | `gzip` | Message compression |
+| `acks`                         | `all` | Acknowledgment level |
+| `retries`                      | `3` | Number of retry attempts |
+| `enable_idempotence`           | `true` | Prevent duplicate messages |
 
 ### Environment Variables
 
@@ -263,7 +263,7 @@ docker exec credit-service-kafka kafka-topics --list --bootstrap-server localhos
 2. Check producer logs:
 ```bash
 # In application logs, look for:
-# "Message published successfully to topic 'loan_applications_submitted'"
+# "Message published successfully to topic 'credit_reports_generated'"
 ```
 
 3. Verify Kafka health:
@@ -287,7 +287,7 @@ The service logs Kafka events at INFO level:
 
 ```
 INFO:src.kafka.kafka_producer:Kafka producer started successfully
-INFO:src.kafka.kafka_producer:Message published successfully to topic 'loan_applications_submitted' [partition: 0, offset: 123]
+INFO:src.kafka.kafka_producer:Message published successfully to topic 'credit_reports_generated' [partition: 0, offset: 123]
 ```
 
 ### Kafka Metrics

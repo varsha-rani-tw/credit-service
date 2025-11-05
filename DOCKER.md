@@ -218,7 +218,7 @@ docker run -d \
   --name credit-service \
   -p 8000:8000 \
   -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
-  -e KAFKA_TOPIC_LOAN_APPLICATIONS=loan_applications_submitted \
+  -e KAFKA_TOPIC_CREDIT_SCORE_GENERATED=credit_reports_generated \
   --network host \
   credit-service:latest
 ```
@@ -261,7 +261,7 @@ The application uses `.env.docker` when running in Docker Compose:
 ```env
 # Kafka Configuration
 KAFKA_BOOTSTRAP_SERVERS=kafka:29092  # Use Docker service name
-KAFKA_TOPIC_LOAN_APPLICATIONS=loan_applications_submitted
+KAFKA_TOPIC_CREDIT_REPORT_GENERATION=credit_reports_generated
 KAFKA_CLIENT_ID=credit-service-docker
 
 # Application settings
@@ -287,7 +287,7 @@ docker run -d \
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker addresses |
-| `KAFKA_TOPIC_LOAN_APPLICATIONS` | `loan_applications_submitted` | Topic name |
+| `KAFKA_TOPIC_CREDIT_SCORE_GENERATED` | `credit_reports_generated` | Topic name |
 | `KAFKA_CLIENT_ID` | `credit-service` | Client identifier |
 | `KAFKA_COMPRESSION_TYPE` | `gzip` | Message compression |
 | `KAFKA_ACKS` | `all` | Acknowledgment level |

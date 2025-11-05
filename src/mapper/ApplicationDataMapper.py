@@ -1,3 +1,4 @@
+from typing import Union
 from src.DTO.ApplicationDataDTO import ApplicationDataDTO
 from src.schema.CibilScoreSchema import ApplicationRequest
 
@@ -5,7 +6,7 @@ from src.schema.CibilScoreSchema import ApplicationRequest
 class ApplicationDataMapper:
 
     @staticmethod
-    def from_dict(data: ApplicationRequest) -> ApplicationDataDTO:
+    def map_application_data_dto(data:  ApplicationRequest) -> ApplicationDataDTO:
 
         return ApplicationDataDTO(
             application_id=data.application_id,

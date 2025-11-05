@@ -68,8 +68,8 @@ services:
       cub kafka-ready -b kafka:29092 1 30
 
       # Create topic
-      echo 'Creating Kafka topic: loan_applications_submitted'
-      kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3 --replication-factor 1 --topic loan_applications_submitted
+      echo 'Creating Kafka topic: credit_reports_generated'
+      kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3 --replication-factor 1 --topic credit_reports_generated
 
       echo 'Kafka topics created successfully'
       "

@@ -9,6 +9,7 @@ from src.service.CibilScoreService import CibilScoreService
 from src.mapper.ApplicationDataMapper import ApplicationDataMapper
 from src.config.kafka_config import KafkaConfig, kafka_config
 from src.kafka.kafka_producer import KafkaProducerService
+from src.kafka.kafka_consumer import KafkaConsumerService
 
 
 class Container(containers.DeclarativeContainer):
@@ -56,3 +57,12 @@ class Container(containers.DeclarativeContainer):
 
     # Mapper Dependencies - Using Singleton as mapper is stateless
     application_data_mapper = providers.Singleton(ApplicationDataMapper)
+
+    # Kafka Consumer - Singleton to maintain single consumer instance
+    kafka_consumer = providers.Singleton(
+        KafkaConsumerService,
+        config=kafka_config_provider,
+        cibil_service=cibil_service,
+        mapper=application_data_mapper,
+        kafka_producer=kafka_producer
+    )

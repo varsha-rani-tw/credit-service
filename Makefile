@@ -82,7 +82,8 @@ kafka-topics:
 kafka-messages:
 	docker exec -it credit-service-kafka kafka-console-consumer \
 		--bootstrap-server localhost:9092 \
-		--topic loan_applications_submitted \
+		--topic  credit_reports_generated \
+
 		--from-beginning \
 		--max-messages 10
 
