@@ -1,6 +1,8 @@
+from uuid import UUID
+
 class ApplicationDataDTO:
 
-    application_id: int
+    application_id: UUID
     pan_number: str
     application_name: str
     monthly_income_inr : float

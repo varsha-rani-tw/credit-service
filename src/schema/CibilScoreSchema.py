@@ -1,8 +1,10 @@
 from pydantic import  BaseModel, Field
 from typing import Optional
+from uuid import UUID
+
 
 class ApplicationRequest(BaseModel):
-    application_id: int = Field(..., description="Application ID is required")
+    application_id: UUID = Field(..., description="Application ID is required")
     pan_number: str = Field(..., description="PAN number is required")
     application_name: Optional[str] = None
     monthly_income_inr: int = Field(..., description="Monthly Income is required")
