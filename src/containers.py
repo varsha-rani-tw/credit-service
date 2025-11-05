@@ -10,6 +10,7 @@ from src.mapper.ApplicationDataMapper import ApplicationDataMapper
 from src.config.kafka_config import KafkaConfig, kafka_config
 from src.kafka.kafka_producer import KafkaProducerService
 from src.kafka.kafka_consumer import KafkaConsumerService
+from src.util.KafkaUtil import KafkaUtil
 
 
 class Container(containers.DeclarativeContainer):
@@ -34,6 +35,7 @@ class Container(containers.DeclarativeContainer):
         config=kafka_config_provider
     )
 
+
     # Handler Dependencies - Using Singleton as handlers are stateless
     pan_handler = providers.Singleton(PanHandler)
 
@@ -44,6 +46,8 @@ class Container(containers.DeclarativeContainer):
     random_handler = providers.Singleton(RandomHanlder)
 
     cap_handler = providers.Singleton(CapHandler)
+
+    kafka_util = providers.Singleton(KafkaUtil)
 
     # Service Dependencies - Using Factory to create new instance per request
     cibil_service = providers.Factory(

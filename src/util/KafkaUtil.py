@@ -1,17 +1,18 @@
 import logging
 
-from dependency_injector.wiring import Provide
-from fastapi import Depends
-
-from src.containers import Container
 from src.kafka.kafka_producer import KafkaProducerService
 
 logger = logging.getLogger(__name__)
 
 class KafkaUtil:
 
-    async def publish_message(self, kafka_message, kafka_producer: KafkaProducerService = Depends(Provide[Container.kafka_producer])):
-        kafka_success = await kafka_producer.publish_loan_application(kafka_message)
+    def __init__(self, kafka_producer_service: KafkaProducerService):
+        self.kafka_producer_service = kafka_producer_service
+
+
+
+    async def publish_message(self, kafka_message: dict):
+        kafka_success = await self.kafka_producer_service.publish_loan_application(kafka_message)
 
         if not kafka_success:
             logger.warning(

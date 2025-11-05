@@ -1,3 +1,6 @@
+from dependency_injector.wiring import Container, Provide
+from fastapi import Depends
+
 from src.Constant.CibilScoreConstant import CibilScoreConstant
 from src.DTO.ApplicationDataDTO import ApplicationDataDTO
 from src.handler.CapHandler import CapHandler
@@ -6,6 +9,7 @@ from src.handler.IncomeHandler import IncomeHandler
 from src.handler.LoanTypeHandler import LoanTypeHandler
 from src.handler.PanHandler import PanHandler
 from src.handler.RandomHandler import RandomHanlder
+from src.util.KafkaUtil import KafkaUtil
 
 
 class CibilScoreService:
@@ -16,7 +20,8 @@ class CibilScoreService:
         income_handler: IncomeHandler,
         loan_handler: LoanTypeHandler,
         random_handler: RandomHanlder,
-        cap_handler: CapHandler
+        cap_handler: CapHandler,
+        kafka_util: KafkaUtil
     ):
 
         self.pan_handler = pan_handler
@@ -25,6 +30,8 @@ class CibilScoreService:
         self.random_handler = random_handler
         self.cap_handler = cap_handler
         self.chain = self.build_chain()
+        self.kafka_util = kafka_util
+
 
     def build_chain(self) -> CibilScoreHandler:
 
@@ -34,15 +41,21 @@ class CibilScoreService:
             .set_next(self.cap_handler)
         return self.pan_handler
 
+    def simulate(
+            self,
+            application_data: ApplicationDataDTO,
+    ):
 
-    def simulate(self, application_data: ApplicationDataDTO):
         intial_cibil_score =  CibilScoreConstant.BASE_CIBIL_SCORE
         final_cibil_score = self.chain.handle(intial_cibil_score,application_data)
+        kafka_message = self.publish_cibil_score(final_cibil_score,application_data)
+        self.kafka_util.publish_message(kafka_message)
+
         return final_cibil_score
 
 
     def  publish_cibil_score(self, final_cibil_score: int, application_data: ApplicationDataDTO):
-        kafka_message = {
+       return   {
             "application_id": application_data.application_id,
             "pan_number": application_data.pan_number,
             "application_name": application_data.application_name,
